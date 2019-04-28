@@ -13,7 +13,7 @@ try {
 
     function insertPostalCode(postalCodeEntry, insertMany = false) {
         try {
-            if(!postalCodeEntry) return false;
+            if(!postalCodeEntry) return logger.error('No given argument to insertPostalCode');
 
             if(insertMany) {
                 return PostalCodeEntry.insertMany(postalCodeEntry, function(err) {

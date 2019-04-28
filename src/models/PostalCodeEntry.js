@@ -4,8 +4,8 @@ const schema = new mongoose.Schema({
     countryCode: 'string',
     postalCode: 'string',
     placeName: 'string',
-    adminName1: 'string', // Область
-    adminName2: 'string' // Район
+    adminName1: 'string', // Region
+    adminName2: 'string' // Community
 });
 const PostalCodeEntry = mongoose.model('PostalCodeEntry', schema);
 
