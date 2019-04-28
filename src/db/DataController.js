@@ -37,7 +37,7 @@ try {
         try {
             return PostalCodeEntry.insertMany(postalCodeEntry, function(err) {
                 if(err) logger.error('Unable to insert many PostalCodeEntry: ', err);
-                else logger.info('Inserted many PostalCodeEntry successfully');
+                else logger.info('Inserted many PostalCodeEntry successfully.');
             });
         } catch (err) {
             logger.error('Unexpecter error at ' + __filename + ' while trying to insertManyPostalCode: ', err);
@@ -52,14 +52,17 @@ try {
                 countryCode: postalCodeEntry.countryCode,
                 postalCode: postalCodeEntry.postalCode,
                 placeName: postalCodeEntry.placeName,
-                adminName1: postalCodeEntry.adminName1, // Область
+                adminName1: postalCodeEntry.adminName1,
                 adminName2: postalCodeEntry.adminName2
-            }, function (err) {
+            }, function (err, postalCode) {
                 if (err) logger.error('Unable to insert one PostalCodeEntry: ', err);
-                // saved!
+                else {
+                    logger.info('Inserted one PostalCodeEntry successfully.');
+                    logger.debug('The inserted PostalCode object: ', postalCode);
+                } 
             });
-        } catch (e) {
-            
+        } catch (err) {
+            logger.error('Unexpected error at ' + __filename + ' while inserting one postal code: ', err);
         }
     }
 
