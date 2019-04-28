@@ -1,10 +1,10 @@
-const logger = require('./logger');
+const logger = require('./utils/logger');
 try {
     const mongoose = require('mongoose');
     const cfg = require('../config/default');
 
-    const PostalCodeEntry = require('./PostalCodeEntry');
-    const FeedbackEntry = require('./FeedbackEntry');
+    const PostalCodeEntry = require('./models/PostalCodeEntry');
+    const FeedbackEntry = require('./models/FeedbackEntry');
 
     mongoose.connect(cfg.mongodb.connectionURI, {useNewUrlParser: true}).then(
         () => { logger.info('Connected to mongoDB successfully') },
