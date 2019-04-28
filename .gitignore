@@ -2,3 +2,4 @@ node_modules
 package-lock.json
 .vs
 config/default.js
+*.log
