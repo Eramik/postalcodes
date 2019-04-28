@@ -20,7 +20,7 @@ try {
     // `postalCodeEntry` must be an array if insertMany === true.
     function insertPostalCode(postalCodeEntry, insertMany = false) {
         try {
-            if(!postalCodeEntry) return logger.error('No given argument to insertPostalCode');
+            if(!postalCodeEntry) throw new Error('No argument given.');
 
             if(insertMany) {
                 return insertManyPostalCode(postalCodeEntry);
@@ -35,6 +35,10 @@ try {
     // The `postalCodeEntryArr` argument is an array of objects which correspond to PostalCodeEntry model.
     function insertManyPostalCode(postalCodeEntryArr) {
         try {
+            // If given not array
+            if(!postalCodeEntryArr || (postalCodeEntryArr && !postalCodeEntryArr.length))
+                throw new Error('The given argument is not an array');
+
             return PostalCodeEntry.insertMany(postalCodeEntryArr, function(err) {
                 if(err) logger.error('Unable to insert many PostalCodeEntry: ', err);
                 else logger.info('Inserted many PostalCodeEntry successfully.');
@@ -48,6 +52,9 @@ try {
     // The `postalCodeEntry` argument must correspond with PostalCodeEntry model.
     function insertOnePostalCode(postalCodeEntry) {
         try {
+            if(!postalCodeEntry) 
+                throw new Error('No argument given.');
+
             return PostalCodeEntry.create({
                 countryCode: postalCodeEntry.countryCode,
                 postalCode: postalCodeEntry.postalCode,
@@ -74,6 +81,8 @@ try {
 
     module.exports = {
         insertPostalCode,
+        insertOnePostalCode,
+        insertManyPostalCode,
         _importPostalCodeEntryFromFile
     }
 } catch (e) {
