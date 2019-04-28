@@ -1,6 +1,6 @@
 // The DataController module implements API to interact with database.
 
-const logger = require('./utils/logger');
+const logger = require('./utils/Logger');
 try {
     const mongoose = require('mongoose');
 

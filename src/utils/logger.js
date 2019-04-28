@@ -1,4 +1,4 @@
-// The logger module initializes winston and exports ready-to-use logger
+// The Logger module initializes winston and exports ready-to-use logger
 
 const winston = require('winston');
 const fs = require('fs');
