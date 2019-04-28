@@ -1,0 +1,25 @@
+{
+  "name": "postalcodes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eramik/postalcodes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Eramik/postalcodes/issues"
+  },
+  "homepage": "https://github.com/Eramik/postalcodes#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "hbs": "^4.0.4",
+    "mongoose": "^5.5.4",
+    "winston": "^3.2.1"
+  }
+}
