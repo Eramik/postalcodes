@@ -14,7 +14,7 @@ try {
         err => { logger.error('Failed to connect to mongoDB: ', err) }
     );
 
-    // Inserts one or many PostalCodeEntry to MongoDB.
+    // Inserts one or many PostalCodeEntry objects to MongoDB.
     //
     // The structur of `postalCodeEntry` object must correspond to PostalCodeEntry model.
     // `postalCodeEntry` must be an array if insertMany === true.
