@@ -25,3 +25,5 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 logger.info('Logger initialized');
+
+module.exports = logger;
