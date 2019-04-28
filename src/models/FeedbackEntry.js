@@ -1,3 +1,5 @@
+// The FeedbackEntry module defines MongoDB model.
+
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({ 

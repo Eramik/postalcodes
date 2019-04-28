@@ -1,6 +1,9 @@
+// The DataController module implements API to interact with database.
+
 const logger = require('./utils/logger');
 try {
     const mongoose = require('mongoose');
+
     const cfg = require('../config/default');
 
     const PostalCodeEntry = require('./models/PostalCodeEntry');
@@ -11,6 +14,10 @@ try {
         err => { logger.error('Failed to connect to mongoDB: ', err) }
     );
 
+    // Inserts one or many PostalCodeEntry to MongoDB.
+    //
+    // The structur of `postalCodeEntry` object must correspond to PostalCodeEntry model.
+    // `postalCodeEntry` must be an array if insertMany === true.
     function insertPostalCode(postalCodeEntry, insertMany = false) {
         try {
             if(!postalCodeEntry) return logger.error('No given argument to insertPostalCode');
@@ -34,6 +41,10 @@ try {
         } catch(err) {
             logger.error('Unexpected error at ' + __filename + ' while inserting postal code: ', err);
         }
+    }
+
+    function _importPostalCodeEntryFromFile(pathToFile) {
+
     }
 
     module.exports = {
