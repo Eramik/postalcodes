@@ -76,7 +76,7 @@ try {
     // Imports PostalCodeEntry objects to database from UTF-8 text file with fields separated with tabs.
     // Fields order must correspond with PostalCodeEntry model.
     function _importPostalCodeEntryFromFile(pathToFile) {
-
+        
     }
 
     module.exports = {
