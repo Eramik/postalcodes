@@ -35,7 +35,7 @@ try {
     // The `postalCodeEntryArr` argument is an array of objects which correspond to PostalCodeEntry model.
     function insertManyPostalCode(postalCodeEntryArr) {
         try {
-            return PostalCodeEntry.insertMany(postalCodeEntry, function(err) {
+            return PostalCodeEntry.insertMany(postalCodeEntryArr, function(err) {
                 if(err) logger.error('Unable to insert many PostalCodeEntry: ', err);
                 else logger.info('Inserted many PostalCodeEntry successfully.');
             });
