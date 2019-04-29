@@ -16,6 +16,43 @@ try {
     err => { logger.error('Failed to connect to mongoDB: ', err) }
   );
 
+  // Searches database for text.
+  // The `searchKeys` obect must contain text fields, keys doesn't matter.
+  // Returns an array of 20 PostalCodeEntry objects that match the best.
+  function search(searchKeys) {
+    try {
+      if(!searchKeys) throw new Error('No arguments given.');
+
+      var searchString = generateSearchString(searchKeys);
+
+      return PostalCodeEntry.find(
+        { $text: { $search: searchString } },
+        { score: { $meta: "textScore" } }
+      ) .sort( { score: { $meta: "textScore" } } )
+        .limit(20)
+        .exec();
+    } catch (err) {
+      logger.error('Unexpected error at ' + __filename + ' while trying to serach: ', err);
+    }
+  }
+
+  // Helper function for `search` function.
+  // The `searchKeys` argument must be an object.
+  function generateSearchString(searchKeys) {
+    try {
+      if(!searchKeys) throw new Error('No arguments given.');
+
+      var searchString = '';
+      for(let key in searchKeys) {
+        searchString += ' ' + searchKeys[key];
+      }
+
+      return searchString;
+    } catch (err) {
+      logger.error('Unexpected error at ' + __filename + ' while trying to generate search string: ', err);
+    }
+  }
+
   // Inserts one or many PostalCodeEntry objects to MongoDB.
   //
   // The structure of `postalCodeEntry` object must correspond to PostalCodeEntry model.
@@ -124,6 +161,7 @@ try {
   }
 
   module.exports = {
+    search,
     insertPostalCode,
     insertOnePostalCode,
     insertManyPostalCode,

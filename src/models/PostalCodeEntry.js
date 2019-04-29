@@ -9,6 +9,13 @@ const schema = new mongoose.Schema({
   adminName1: 'string', // Region
   adminName2: 'string' // Community
 });
+schema.index({ 
+  countryCode: 'text', 
+  postalCode: 'text', 
+  placeName: 'text', 
+  adminName1: 'text', 
+  adminName2 : 'text' 
+});
 const PostalCodeEntry = mongoose.model('PostalCodeEntry', schema);
 
 module.exports = PostalCodeEntry;
