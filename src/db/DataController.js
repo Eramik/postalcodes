@@ -116,7 +116,7 @@ try {
           await insertManyPostalCode(temp);
         }
         logger.info('Importing many PostalCodeEntry finished successfully.');
-      }) 
+      });
       
     } catch (err) {
       logger.error('Unexpected error at ' + __filename + ' while trying to import postal code entry from file: ', err);

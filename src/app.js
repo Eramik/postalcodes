@@ -7,8 +7,6 @@ try {
   const DataController = require('./db/DataController');
 
   logger.info('App started successfully.');
-
-  DataController._importPostalCodeEntryFromFile('allCountries.txt');
 } catch (err) {
   logger.error('Unexpected error at ' + __filename + ': ', err);
 }
