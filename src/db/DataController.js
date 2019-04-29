@@ -76,7 +76,6 @@ try {
   }
 
   // Imports PostalCodeEntry objects to database from UTF-8 text file with fields separated with tabs.
-  // Fields order must correspond with PostalCodeEntry model.
   function _importPostalCodeEntryFromFile(pathToFile) {
     try {
       if(!pathToFile) throw new Error('No argument given.');
@@ -88,8 +87,8 @@ try {
       });
 
       // Determines a number of documents sent to database per request.
-      const BATCH_SIZE = 256;
-      
+      const BATCH_SIZE = 1024;
+
       var batch = [];
 
       rl.on('line', async line => {
