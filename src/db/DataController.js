@@ -2,89 +2,134 @@
 
 const logger = require('../utils/Logger');
 try {
-    const mongoose = require('mongoose');
+  const mongoose = require('mongoose');
+  const fs = require('fs');
+  const readline = require('readline');
 
-    const cfg = require('../../config/default');
+  const cfg = require('../../config/default');
 
-    const PostalCodeEntry = require('../models/PostalCodeEntry');
-    const FeedbackEntry = require('../models/FeedbackEntry');
+  const PostalCodeEntry = require('../models/PostalCodeEntry');
+  const FeedbackEntry = require('../models/FeedbackEntry');
 
-    mongoose.connect(cfg.mongodb.connectionURI, {useNewUrlParser: true}).then(
-        () => { logger.info('Connected to mongoDB successfully') },
-        err => { logger.error('Failed to connect to mongoDB: ', err) }
-    );
+  mongoose.connect(cfg.mongodb.connectionURI, {useNewUrlParser: true}).then(
+    () => { logger.info('Connected to mongoDB successfully') },
+    err => { logger.error('Failed to connect to mongoDB: ', err) }
+  );
 
-    // Inserts one or many PostalCodeEntry objects to MongoDB.
-    //
-    // The structure of `postalCodeEntry` object must correspond to PostalCodeEntry model.
-    // `postalCodeEntry` must be an array if insertMany === true.
-    function insertPostalCode(postalCodeEntry, insertMany = false) {
-        try {
-            if(!postalCodeEntry) throw new Error('No argument given.');
+  // Inserts one or many PostalCodeEntry objects to MongoDB.
+  //
+  // The structure of `postalCodeEntry` object must correspond to PostalCodeEntry model.
+  // `postalCodeEntry` must be an array if insertMany === true.
+  function insertPostalCode(postalCodeEntry, insertMany = false) {
+    try {
+      if(!postalCodeEntry) throw new Error('No argument given.');
 
-            if(insertMany) {
-                return insertManyPostalCode(postalCodeEntry);
-            } 
-            return insertOnePostalCode(postalCodeEntry);
-        } catch(err) {
-            logger.error('Unexpected error at ' + __filename + ' while inserting postal code: ', err);
+      if(insertMany) {
+        return insertManyPostalCode(postalCodeEntry);
+      } 
+      return insertOnePostalCode(postalCodeEntry);
+    } catch(err) {
+      logger.error('Unexpected error at ' + __filename + ' while inserting postal code: ', err);
+    }
+  }
+
+  // Inserts a batch of PostalCodeEntry into databse.
+  // The `postalCodeEntryArr` argument is an array of objects which correspond to PostalCodeEntry model.
+  function insertManyPostalCode(postalCodeEntryArr) {
+    try {
+      // If given not array
+      if(!postalCodeEntryArr || (postalCodeEntryArr && !postalCodeEntryArr.length))
+        throw new Error('The given argument is not an array');
+
+      return PostalCodeEntry.insertMany(postalCodeEntryArr, function(err) {
+        if(err) logger.error('Unable to insert many PostalCodeEntry: ', err);
+        else logger.info('Inserted many PostalCodeEntry successfully.');
+      });
+    } catch (err) {
+      logger.error('Unexpecter error at ' + __filename + ' while trying to insertManyPostalCode: ', err);
+    }
+  }
+
+  // Inserts PostalCodeEntry into database.
+  // The `postalCodeEntry` argument must correspond with PostalCodeEntry model.
+  function insertOnePostalCode(postalCodeEntry) {
+    try {
+      if(!postalCodeEntry) 
+        throw new Error('No argument given.');
+
+      return PostalCodeEntry.create({
+        countryCode: postalCodeEntry.countryCode,
+        postalCode: postalCodeEntry.postalCode,
+        placeName: postalCodeEntry.placeName,
+        adminName1: postalCodeEntry.adminName1,
+        adminName2: postalCodeEntry.adminName2
+      }, function (err, postalCode) {
+        if (err) logger.error('Unable to insert one PostalCodeEntry: ', err);
+        else {
+          logger.info('Inserted one PostalCodeEntry successfully.');
+          logger.debug('The inserted PostalCode object: ', postalCode);
+        } 
+      });
+    } catch (err) {
+      logger.error('Unexpected error at ' + __filename + ' while inserting one postal code: ', err);
+    }
+  }
+
+  // Imports PostalCodeEntry objects to database from UTF-8 text file with fields separated with tabs.
+  // Fields order must correspond with PostalCodeEntry model.
+  function _importPostalCodeEntryFromFile(pathToFile) {
+    try {
+      if(!pathToFile) throw new Error('No argument given.');
+      if(!fs.existsSync(pathToFile)) throw new Error("File doesn't exist.");
+
+      const fileStream = fs.createReadStream(pathToFile, {encoding: 'utf-8'});
+      const rl = readline.createInterface({
+        input: fileStream
+      });
+
+      // Determines a number of documents sent to database per request.
+      const BATCH_SIZE = 256;
+      
+      var batch = [];
+
+      rl.on('line', async line => {
+        const data = line.split('\t');
+        const postalCodeEntry = {
+          countryCode: data[0],
+          postalCode: data[1],
+          placeName: data[2],
+          adminName1: data[3],
+          adminName2: data[5]
+        };
+        batch.push(postalCodeEntry);
+
+        if(batch.length >= BATCH_SIZE) {
+          const temp = batch;
+          batch = [];
+          await insertManyPostalCode(temp);
         }
-    }
+      });
 
-    // Inserts a batch of PostalCodeEntry into databse.
-    // The `postalCodeEntryArr` argument is an array of objects which correspond to PostalCodeEntry model.
-    function insertManyPostalCode(postalCodeEntryArr) {
-        try {
-            // If given not array
-            if(!postalCodeEntryArr || (postalCodeEntryArr && !postalCodeEntryArr.length))
-                throw new Error('The given argument is not an array');
-
-            return PostalCodeEntry.insertMany(postalCodeEntryArr, function(err) {
-                if(err) logger.error('Unable to insert many PostalCodeEntry: ', err);
-                else logger.info('Inserted many PostalCodeEntry successfully.');
-            });
-        } catch (err) {
-            logger.error('Unexpecter error at ' + __filename + ' while trying to insertManyPostalCode: ', err);
+      rl.on('close', async () => {
+        if(batch.length !== 0) {
+          const temp = batch;
+          batch = [];
+          await insertManyPostalCode(temp);
         }
+        logger.info('Importing many PostalCodeEntry finished successfully.');
+      }) 
+      
+    } catch (err) {
+      logger.error('Unexpected error at ' + __filename + ' while trying to import postal code entry from file: ', err);
     }
+  }
 
-    // Inserts PostalCodeEntry into database.
-    // The `postalCodeEntry` argument must correspond with PostalCodeEntry model.
-    function insertOnePostalCode(postalCodeEntry) {
-        try {
-            if(!postalCodeEntry) 
-                throw new Error('No argument given.');
-
-            return PostalCodeEntry.create({
-                countryCode: postalCodeEntry.countryCode,
-                postalCode: postalCodeEntry.postalCode,
-                placeName: postalCodeEntry.placeName,
-                adminName1: postalCodeEntry.adminName1,
-                adminName2: postalCodeEntry.adminName2
-            }, function (err, postalCode) {
-                if (err) logger.error('Unable to insert one PostalCodeEntry: ', err);
-                else {
-                    logger.info('Inserted one PostalCodeEntry successfully.');
-                    logger.debug('The inserted PostalCode object: ', postalCode);
-                } 
-            });
-        } catch (err) {
-            logger.error('Unexpected error at ' + __filename + ' while inserting one postal code: ', err);
-        }
-    }
-
-    // Imports PostalCodeEntry objects to database from UTF-8 text file with fields separated with tabs.
-    // Fields order must correspond with PostalCodeEntry model.
-    function _importPostalCodeEntryFromFile(pathToFile) {
-        
-    }
-
-    module.exports = {
-        insertPostalCode,
-        insertOnePostalCode,
-        insertManyPostalCode,
-        _importPostalCodeEntryFromFile
-    }
+  module.exports = {
+    insertPostalCode,
+    insertOnePostalCode,
+    insertManyPostalCode,
+    _importPostalCodeEntryFromFile
+  }
 } catch (e) {
-    logger.error('Unexpected error at ' + __filename + ': ', e);
+  logger.error('Unexpected error at ' + __filename + ': ', e);
 }
