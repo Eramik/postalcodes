@@ -14,16 +14,13 @@ class Searcher {
         for(let key in this.database) {
             this.database[key].__proto__ = PostalCodeEntry.prototype;
         }
-        console.log(this.database.length);
     }
 
     search(searchParams) {
         this._searchResultsCollector.resultsAmountLimit = searchParams.resultsLimit;
-        for(let key in this.database) {
-            console.log('w');
-            let record = this.database[key];
+        for(let i = 0; i < this.database.length; i++) {
+            let record = this.database[i];
             let result = new SearchResult(record, record.calculateMatchRate(searchParams.searchData));
-            console.log("result: ", result.matchRate);
             this._searchResultsCollector.addResult(result);
         }
         return this._searchResultsCollector.results;

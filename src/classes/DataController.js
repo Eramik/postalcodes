@@ -41,7 +41,8 @@ class DataController {
                     region: data[3],
                     community: data[5]
                 };
-                this.database.push(new PostalCodeEntry(postalCodeEntry));
+                let p = new PostalCodeEntry(postalCodeEntry);
+                this.database.push(p);
             });
         
             rl.on('close', async () => {

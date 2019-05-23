@@ -9,11 +9,11 @@ class PostalCodeEntry extends ISearchable {
 
     constructor(data = {}) {
         super();
-        this.countryCode = data.countryCode | null;
-        this.postalCode = data.postalCode | null;
-        this.placeName = data.placeName | null;
-        this.region = data.region | null;
-        this.community = data.community | null;
+        this.countryCode = data.countryCode || null;
+        this.postalCode = data.postalCode || null;
+        this.placeName = data.placeName || null;
+        this.region = data.region || null;
+        this.community = data.community || null;
     }
 
     calculateMatchRate(searchData) {
@@ -25,7 +25,6 @@ class PostalCodeEntry extends ISearchable {
     }
 
     _calculatePartialMatchRate(text, searchText) {
-        console.log('text: ', text);
         return text.toString().search(searchText) !== -1 ? 1 : 0;
     }
 }
