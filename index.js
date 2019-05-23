@@ -1,6 +1,6 @@
 // Entry point file.
-try {
+//try {
   require('./src/app.js');
-} catch(e) {
-  console.error('Fatal error. Unable to start app.js: ', JSON.stringify(e));
-}
+//} catch(e) {
+//  console.error('Fatal error. Unable to start app.js: ', JSON.stringify(e));
+//}
