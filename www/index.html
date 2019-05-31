@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Postal Codes Searcher</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+        <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous">
+        </script>
+        <script
+            src='https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js'>
+        </script>
+        <style>
+            #wrapper {
+                max-width: 500px;
+                width: 95%;
+                height: 100%;
+                margin: auto;
+            }
+
+            .center {
+                margin: auto;
+                text-align: center;
+            }
+
+            #search {
+                margin-top: 10px;
+                margin-bottom: 20px;
+            }
+
+            #results {
+                display: none;
+                width: 90%;
+                max-width: 800px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id='wrapper'>
+            <div class="pure-form pure-form-aligned">
+                <fieldset>
+                    <div class="pure-control-group">
+                        <label for="country-code">Country</label>
+                        <select id="country-code" class="pure-input-1-2">
+                            <option value="">All</option>
+                            <option value="UA">Ukraine</option>
+                            <option value="US">United States</option>
+                        </select>
+                    </div>
+            
+                    <div class="pure-control-group">
+                        <label for="region">Region</label>
+                        <input class="pure-input-1-2" id="region" type="text" maxlength="30" placeholder="Region">
+                    </div>
+            
+                    <div class="pure-control-group">
+                        <label for="community">Community</label>
+                        <input class="pure-input-1-2" id="community" type="text" maxlength="30" placeholder="Community">
+                    </div>
+
+                    <div class="pure-control-group">
+                        <label for="place">Place</label>
+                        <input class="pure-input-1-2" id="place" type="text" maxlength="30" placeholder="Place">
+                    </div>
+            
+                    <div class="pure-control-group">
+                        <label for="postal-code">Postal code</label>
+                        <input class="pure-input-1-2" id="postal-code" type="text" maxlength="10" placeholder="Postal code">
+                    </div>
+
+                    <div class="pure-control-group">
+                        <label for="amount">Amount of results</label>
+                        <input class="pure-input-1-2" id="amount" type="number" value='5' min='1' max='15' placeholder="Amount of results">
+                    </div>
+            
+                    <div class='center'>
+                        <button id="search" type="button" class="pure-button pure-button-primary">Search</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+
+            <table id='results'  class="pure-table pure-table-horizontal pure-table-striped center">
+                    <thead>
+                        <tr>
+                            <th>Country Code</th>
+                            <th>Region</th>
+                            <th>Community</th>
+                            <th>Place</th>
+                            <th>Postal code</th>
+                        </tr>
+                    </thead>
+                
+                    <tbody id='results-storage'>
+                        <tr>
+                            <td>1</td>
+                            <td>Honda</td>
+                            <td>Accord</td>
+                            <td>2009</td>
+                        </tr>
+                
+                        <tr>
+                            <td>2</td>
+                            <td>Toyota</td>
+                            <td>Camry</td>
+                            <td>2012</td>
+                        </tr>
+                
+                        <tr>
+                            <td>3</td>
+                            <td>Hyundai</td>
+                            <td>Elantra</td>
+                            <td>2010</td>
+                        </tr>
+                    </tbody>
+                </table>
+        
+        <script>
+            $( document ).ready(function() {
+                $('#search').on('click', $.throttle(1000, () => {
+                    let payload = gatherInput();
+                    $.ajax({
+                        url: "http://localhost:3000/search",
+                        data: JSON.stringify(payload),
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json"
+                    }).done(function(response) {
+                        $('#results-storage').html('');
+                        for(let key in response) {
+                            let row = response[key].data;
+                            let tr = $('<tr>');
+
+                            addTd(tr, row.countryCode);
+                            addTd(tr, row.region);
+                            addTd(tr, row.community);
+                            addTd(tr, row.placeName);
+                            addTd(tr, row.postalCode);
+
+                            $('#results-storage').append(tr);
+                        }
+                        $('#results').show();
+                    });
+                }));
+            });
+
+            function gatherInput() {
+                var payload = {
+                        resultsLimit: $('#amount').val() || null,
+                        searchData: {
+                            countryCode: $('#country-code').val() || null,
+                            region: $('#region').val() || null,
+                            community: $('#community').val() || null,
+                            placeName: $('#place').val() || null,
+                            postalCode: $('#postal-code').val() || null
+                        }
+                };
+                return payload;
+            }
+
+            function addTd(tr, data) {
+                let td = $('<td>');
+                td.text(data);
+                tr.append(td);
+            }
+        </script>
+    </body>
+</html>

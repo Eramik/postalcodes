@@ -19,7 +19,7 @@ class SearchResultsCollector {
     }
 
     get results() {
-        return this._searchResults.sort((a,b) => a.matchRate - b.matchRate);
+        return this._searchResults.sort((a,b) => b.matchRate - a.matchRate);
     }
 
     addResult(searchResult) {
