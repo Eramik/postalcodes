@@ -1,14 +1,16 @@
+// Work with files.
 const fs = require('fs');
 const readline = require('readline');
 
 const PostalCodeEntry = require('./PostalCodeEntry');
 const logger = require('../utils/Logger');
 
-
+// Class for reading and writing data.
 class DataController {
     database;
     _initPath;
 
+    
     constructor(pathToFile = null) {
         if(!pathToFile) {
             this.database = [];
